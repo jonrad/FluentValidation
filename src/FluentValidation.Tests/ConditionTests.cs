@@ -69,6 +69,19 @@ namespace FluentValidation.Tests {
 			result.Errors.Count.ShouldEqual(1);
 		}
 
+		[Test]
+		public void Validation_should_fail_when_condition_on_property_matches() {
+			var validator = new TestValidator {
+				v => v.RuleFor(x => x.Surname).Must(p => p != "bar").WhenProperty(p => !string.IsNullOrEmpty(p))
+			};
+
+			var result = validator.Validate(new Person
+			{
+				Surname = "bar"
+			});
+			result.Errors.Count.ShouldEqual(1);
+		}
+
 		private class TestConditionValidator : AbstractValidator<Person> {
 			public TestConditionValidator() {
 				RuleFor(x => x.Forename).NotNull().When(x => x.Id == 0);

@@ -190,6 +190,24 @@ namespace FluentValidation {
 		}
 
 		/// <summary>
+		/// Specifies a condition limiting when the validator should run. 
+		/// The validator will only be executed if the result of the lambda returns true.
+		/// </summary>
+		/// <param name="rule">The current rule</param>
+		/// <param name="predicate">A lambda expression that specifies a condition for when the validator should run</param>
+		/// <param name="applyConditionTo">Whether the condition should be applied to the current rule or all rules in the chain</param>
+		/// <returns></returns>
+		public static IRuleBuilderOptions<T, TProperty> WhenProperty<T,TProperty>(this IRuleBuilderOptions<T, TProperty> rule, Func<TProperty, bool> predicate, ApplyConditionTo applyConditionTo = ApplyConditionTo.AllValidators) {
+			predicate.Guard("A predicate must be specified when calling WhenProperty.");
+			// Default behaviour for When/Unless as of v1.3 is to apply the condition to all previous validators in the chain.
+			return rule.Configure(config =>
+			{
+			    var objPredicate = new Func<T, bool>(obj => predicate((TProperty) config.PropertyFunc(obj)));
+				config.ApplyCondition(objPredicate.CoerceToNonGeneric(), applyConditionTo);
+			});
+		}
+
+		/// <summary>
 		/// Specifies a condition limiting when the validator should not run. 
 		/// The validator will only be executed if the result of the lambda returns false.
 		/// </summary>
