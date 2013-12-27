@@ -190,6 +190,19 @@ namespace FluentValidation {
 		}
 
 		/// <summary>
+		/// Specifies a condition limiting when the validator should not run. 
+		/// The validator will only be executed if the result of the lambda returns false.
+		/// </summary>
+		/// <param name="rule">The current rule</param>
+		/// <param name="predicate">A lambda expression that specifies a condition for when the validator should not run</param>
+		/// <param name="applyConditionTo">Whether the condition should be applied to the current rule or all rules in the chain</param>
+		/// <returns></returns>
+		public static IRuleBuilderOptions<T, TProperty> Unless<T, TProperty>(this IRuleBuilderOptions<T, TProperty> rule, Func<T, bool> predicate, ApplyConditionTo applyConditionTo = ApplyConditionTo.AllValidators) {
+			predicate.Guard("A predicate must be specified when calling Unless");
+			return rule.When(x => !predicate(x), applyConditionTo);
+		}
+
+		/// <summary>
 		/// Specifies a condition limiting when the validator should run. 
 		/// The validator will only be executed if the result of the lambda returns true.
 		/// </summary>
@@ -215,9 +228,9 @@ namespace FluentValidation {
 		/// <param name="predicate">A lambda expression that specifies a condition for when the validator should not run</param>
 		/// <param name="applyConditionTo">Whether the condition should be applied to the current rule or all rules in the chain</param>
 		/// <returns></returns>
-		public static IRuleBuilderOptions<T, TProperty> Unless<T, TProperty>(this IRuleBuilderOptions<T, TProperty> rule, Func<T, bool> predicate, ApplyConditionTo applyConditionTo = ApplyConditionTo.AllValidators) {
-			predicate.Guard("A predicate must be specified when calling Unless");
-			return rule.When(x => !predicate(x), applyConditionTo);
+		public static IRuleBuilderOptions<T, TProperty> UnlessProperty<T, TProperty>(this IRuleBuilderOptions<T, TProperty> rule, Func<TProperty, bool> predicate, ApplyConditionTo applyConditionTo = ApplyConditionTo.AllValidators) {
+			predicate.Guard("A predicate must be specified when calling UnlessProperty");
+			return rule.WhenProperty(x => !predicate(x), applyConditionTo);
 		}
 
 
